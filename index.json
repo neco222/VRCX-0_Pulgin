@@ -4,14 +4,14 @@
     {
       "id": "user-status-stats",
       "name": "User Status Statistics",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": "VRCX-0 Plugin Store",
       "description": "Displays online status duration percentages in each friend's Activity tab, excluding offline time.",
       "updatedAt": "2026-10-05",
       "apiVersion": 1,
       "entry": "plugins/user-status-stats/index.js",
       "manifest": "plugins/user-status-stats/manifest.json",
-      "sha256": "b9bba94f73b58c08020566c3290dd893f4086f5b7332cf803cb6da5814254fa7",
+      "sha256": "453248d8565fd09fe874b3e14c52e7ea83c6696bda230c6dbded227ecfeb38b7",
       "icon": "plugins/user-status-stats/assets/icon.svg",
       "permissions": [
         "feed.read",
@@ -21,10 +21,27 @@
       ],
       "files": {
         "plugins/user-status-stats/assets/icon.svg": "e6284c85dd68b3623723052abf2d2f5fc4873dfbeba72e1a317d087e9d443b20",
-        "plugins/user-status-stats/index.js": "b9bba94f73b58c08020566c3290dd893f4086f5b7332cf803cb6da5814254fa7",
-        "plugins/user-status-stats/manifest.json": "5a1b84314330710e7996751f6415044e18a9f7ef2740409e1b66de614da90586"
+        "plugins/user-status-stats/index.js": "453248d8565fd09fe874b3e14c52e7ea83c6696bda230c6dbded227ecfeb38b7",
+        "plugins/user-status-stats/manifest.json": "65baeba78f18728dcef52e36bc47d06f2baf3d3bef8c4b7b65415f2f6c4b38de"
       },
       "releases": [
+        {
+          "version": "1.1.0",
+          "entry": "plugins/user-status-stats/index.js",
+          "sha256": "b9bba94f73b58c08020566c3290dd893f4086f5b7332cf803cb6da5814254fa7",
+          "permissions": [
+            "feed.read",
+            "userDialog.modify",
+            "settings.create",
+            "storage"
+          ]
+        },
+        {
+          "version": "1.2.0",
+          "entry": "plugins/user-status-stats/index.js",
+          "sha256": "453248d8565fd09fe874b3e14c52e7ea83c6696bda230c6dbded227ecfeb38b7",
+          "permissions": ["feed.read", "userDialog.modify"]
+        },
         {
           "version": "1.0.0",
           "entry": "plugins/user-status-stats/index.js",
