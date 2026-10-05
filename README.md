@@ -1,39 +1,60 @@
-# VRCX-0_Pulgin
-VRCX-0 Pulgin
+# VRCX-0 Plugin Store
 
-## Official VRCX-0 Plugin Store
+VRCX-0の設定画面から機能を追加できる公式プラグインストアです。一覧は`index.json`、本体は`plugins/`に保存されています。
 
-This directory is a separate, publishable official GitHub Plugin Store. It is independent of the BetterVRCX0 loader repository. Users install its registered plugins from VRCX-0's Settings → Plugins → Store. There is no local file, arbitrary URL, or custom script installation feature.
+## はじめに
 
-The official managed repository is [neco222/VRCX-0_Pulgin](https://github.com/neco222/VRCX-0_Pulgin), branch `main`. Its catalog is [index.json](https://raw.githubusercontent.com/neco222/VRCX-0_Pulgin/main/index.json). The BetterVRCX0 distributor pins owner `neco222`, repository `VRCX-0_Pulgin`, and ref `main` during the loader's initial build/setup. There is no user-facing arbitrary store URL input. Normal plugin operations then require no file placement or EXE patching.
+初回導入に必要な **BetterVRCX0ローダー** は別のパッケージです。未導入の場合は、別途入手した配布ZIPを展開し、同梱の`Start-BetterVRCX0.bat`からセットアップ・起動してください。
+その後の操作はVRCX-0内で行えます。プラグインのファイルを手動コピーする必要はありません。
 
-## Maintainer publishing
+## プラグインの使い方
 
-1. Review a plugin's standalone `plugins/<id>/index.js`, manifest, declared permissions and assets.
-2. Update its semantic version and `updatedAt`, then run `npm run index`.
-3. Run `npm test` and `npm run validate`.
-4. Commit the reviewed plugin and generated `index.json` together and push to `neco222/VRCX-0_Pulgin` on `main`. Prefer branch protection and reviewed changes.
+1. BetterVRCX0から起動したVRCX-0で、**Settings → Plugins → Store** を開きます。
+2. 検索欄からプラグインを探し、**Install** を押します。
+3. **Installed** で、インストール済みプラグインを管理します。
 
-`index.json` is the authoritative catalog. Its entry SHA-256 and `files` hashes cover every packaged file, including the manifest and icon. Downloads must come from the pinned official repository/ref and match these hashes before install/update or execution. The metadata manifest is descriptive and never executable. A hash proves consistency with the fetched catalog; access to the official repository must also be protected because a publisher who can replace both catalog and payload can replace code.
-
-When a reviewed plugin advances to a newer version, the generator retains the previous catalog's reviewed `{version, entry, sha256, permissions}` under that plugin's `releases`. Those explicit official catalog pins allow existing installations to continue running while displaying Update available. They do not permit new installation of local or arbitrary historical files; the installer downloads only the current release. Changes to executable content or permissions at the same version are rejected and require a version bump.
-
-To revoke an old version, set `releases` in `manifest.json` to an explicit list containing only the historical pins you still approve, or `[]` to revoke all old releases, and regenerate/publish the index. This override replaces preserved history. Removing the plugin from the catalog revokes the entire plugin. Keep at most 20 historical authorizations and review their permissions along with current code. Runtime historical authorization comes from the official catalog, never a locally invented release manifest.
-
-The default icon is a packaged SVG. The chart colors are supplied by the host adapter's existing `--status-online`, `--status-joinme`, `--status-askme`, and `--status-busy` theme variables. The icon's artwork colors do not determine chart colors.
+| ボタン | 操作 |
+| --- | --- |
+| ON / OFF | 機能を有効化・無効化します。状態は次回起動時も維持されます。 |
+| Settings | プラグインごとの設定を変更します。 |
+| Update | 新しいバージョンがある場合に更新します。 |
+| Uninstall | プラグインと保存された設定を削除します。 |
 
 ## User Status Statistics
 
-This plugin requests `feed.read` and `userDialog.modify` for history/chart access, plus `settings.create` and `storage` for its saved default-period setting. Its entire host interaction uses `api.ui.addUserDialogTab`, `api.vrcx.queryFeed` and `api.settings`; it does not query the host DOM, open SQLite, or call Tauri. Its classic JavaScript entry calls `registerPlugin({start, stop})` inside the isolated loader sandbox. The host supplies the chart renderer, period selector, theme, and lifecycle cleanup.
+ユーザー詳細画面の **Status Usage** タブに円グラフを追加します。変更回数ではなく、**そのステータスで過ごした時間**から割合を計算し、Offlineは除外します。
 
-The initial default is 30 days; 7 days, 90 days and all recorded history are also available. Plugin Settings can save a default of 7, 30 or 90 days, applied the next time the plugin is enabled. Unsupported values use 30 days. The adapter supplies `{rows, from, to, coverage}` from the existing `app__feed_rows_query` with the authenticated account as `userId`, the target as `scopedUserIds`, `Status`/`Online`/`Offline` filters, complete cursor pagination, and boundary seed events. Returned rows use `created_at`, `previousStatus`, `rowId`, and `sourceRank` as in VRCX-0's current contracts. Before-range seed events establish state but their duration is clipped out of the selected range.
+| ステータス | 色 |
+| --- | --- |
+| join me | 青 |
+| active | 緑 |
+| ask me | オレンジ |
+| busy | 赤 |
 
-The plugin integrates elapsed milliseconds. Offline time never enters the denominator. An Online event establishes presence but VRCX-0 stores no status in it. A subsequent Status event's `previousStatus` can resolve the intervening online segment. Offline resets the status so an unobserved change while offline is not guessed. Missing initial presence/status, conflicting history, and unknown statuses are excluded and returned as `unknownMilliseconds`. Description-only updates do not add weight. Ties are deterministic, with Offline winning a same-timestamp conflict.
+期間は **7 days / 30 days / 90 days / All** から選べます。初期設定は30日です。
+Settingsで既定の期間を7・30・90日に変更でき、OFF → ONしたときに反映されます。
+VRCX-0に保存された履歴を使用するため、記録されていない期間は集計できません。
 
-These are durations inferred from recorded observations, not independently tracked real-world presence. Missing events while VRCX-0 is closed, disabled feed persistence, removed history, and truncation can limit coverage. The adapter must return those coverage limitations and cap `to` if it has a trusted last observation time. The plugin propagates coverage to the host UI; it never substitutes event counts or silently creates online time during known offline intervals.
+## ファイルの役割
 
-OFF/uninstall removes the tab and settings page through host ownership and `stop()`. Uninstall removes the saved plugin preference through the core's namespaced storage. The plugin stores no personal history of its own and has no separate statistics database.
+| ファイル・フォルダー | 内容 |
+| --- | --- |
+| `README.md` | この説明書 |
+| `index.json` | VRCX-0が読み込むプラグイン一覧・バージョン・確認用ハッシュ |
+| `plugins/` | プラグイン本体・情報・アイコン |
+| `LICENSE` | MITライセンスの利用条件 |
+| `.github/` | 管理者向けの一覧生成・テスト・自動チェック |
 
-## License
+<details><summary>管理者向け：更新とチェック</summary>
 
-The plugin source, store tooling, tests, and packaged icon are available under the [MIT License](LICENSE).
+コードや権限を変更するときはversionと更新日を更新し、一覧を再生成します。旧版の許可履歴（`releases`）も確認してください。
+
+```sh
+node .github/scripts/store-index.mjs
+node --test .github/tests/*.test.mjs
+node .github/scripts/store-index.mjs --check
+```
+
+プラグインと生成された`index.json`を一緒に公開します。登録されたハッシュと一致するファイルだけが実行されます。
+
+</details>

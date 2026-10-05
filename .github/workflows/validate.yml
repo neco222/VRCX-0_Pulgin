@@ -8,5 +8,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: npm test
-      - run: npm run validate
+      - run: node --test .github/tests/*.test.mjs
+      - run: node .github/scripts/store-index.mjs --check

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 
-const source = await readFile(new URL('../plugins/user-status-stats/index.js', import.meta.url), 'utf8');
+const source = await readFile(new URL('../../plugins/user-status-stats/index.js', import.meta.url), 'utf8');
 const hour = 60 * 60 * 1000;
 const at = (hourValue, day = '2026-10-01') => Date.parse(`${day}T00:00:00Z`) + hourValue * hour;
 const row = (time, type, status, previousStatus, extras = {}) => ({

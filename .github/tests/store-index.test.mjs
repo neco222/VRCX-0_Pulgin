@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFile, cp, mkdtemp, appendFile, writeFile, rm } from 'node:fs/promises';
+import { readFile, cp, mkdtemp, mkdir, appendFile, writeFile, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
 
-const root = fileURLToPath(new URL('../', import.meta.url));
+const root = fileURLToPath(new URL('../../', import.meta.url));
 test('catalog hashes include manifest, executable entry and packaged icon', async () => {
     const catalog = JSON.parse(await readFile(path.join(root, 'index.json'), 'utf8'));
     assert.equal(catalog.schemaVersion, 1);
@@ -27,12 +27,13 @@ test('publishing validator rejects a payload changed without updating its catalo
     const fixture = await mkdtemp(path.join(os.tmpdir(), 'vrcx-store-validation-'));
     try {
         await cp(path.join(root, 'plugins'), path.join(fixture, 'plugins'), { recursive: true });
-        await cp(path.join(root, 'scripts'), path.join(fixture, 'scripts'), { recursive: true });
+        await mkdir(path.join(fixture, '.github'), { recursive: true });
+        await cp(path.join(root, '.github/scripts'), path.join(fixture, '.github/scripts'), { recursive: true });
         await cp(path.join(root, 'index.json'), path.join(fixture, 'index.json'));
-        const original = spawnSync(process.execPath, [path.join(fixture, 'scripts/store-index.mjs'), '--check'], { encoding: 'utf8' });
+        const original = spawnSync(process.execPath, [path.join(fixture, '.github/scripts/store-index.mjs'), '--check'], { encoding: 'utf8' });
         assert.equal(original.status, 0, original.stderr);
         await appendFile(path.join(fixture, 'plugins/user-status-stats/index.js'), '\n// altered payload\n');
-        const altered = spawnSync(process.execPath, [path.join(fixture, 'scripts/store-index.mjs'), '--check'], { encoding: 'utf8' });
+        const altered = spawnSync(process.execPath, [path.join(fixture, '.github/scripts/store-index.mjs'), '--check'], { encoding: 'utf8' });
         assert.notEqual(altered.status, 0);
         assert.match(altered.stderr, /differs from plugin metadata\/content|changed without a version bump/);
     } finally {
@@ -47,7 +48,8 @@ test('version bumps keep approved old hashes, and explicit releases list can rev
     const fixture = await mkdtemp(path.join(os.tmpdir(), 'vrcx-store-validation-'));
     try {
         await cp(path.join(root, 'plugins'), path.join(fixture, 'plugins'), { recursive: true });
-        await cp(path.join(root, 'scripts'), path.join(fixture, 'scripts'), { recursive: true });
+        await mkdir(path.join(fixture, '.github'), { recursive: true });
+        await cp(path.join(root, '.github/scripts'), path.join(fixture, '.github/scripts'), { recursive: true });
         await cp(path.join(root, 'index.json'), path.join(fixture, 'index.json'));
         const indexPath = path.join(fixture, 'index.json');
         const manifestPath = path.join(fixture, 'plugins/user-status-stats/manifest.json');
@@ -56,7 +58,7 @@ test('version bumps keep approved old hashes, and explicit releases list can rev
         manifest.version = '1.1.0';
         await writeFile(manifestPath, JSON.stringify(manifest));
         await appendFile(path.join(fixture, 'plugins/user-status-stats/index.js'), '\n// reviewed new release\n');
-        const generate = () => spawnSync(process.execPath, [path.join(fixture, 'scripts/store-index.mjs')], { encoding: 'utf8' });
+        const generate = () => spawnSync(process.execPath, [path.join(fixture, '.github/scripts/store-index.mjs')], { encoding: 'utf8' });
         const updated = generate();
         assert.equal(updated.status, 0, updated.stderr);
         const after = JSON.parse(await readFile(indexPath, 'utf8')).plugins[0];

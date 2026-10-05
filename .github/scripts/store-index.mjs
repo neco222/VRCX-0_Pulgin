@@ -3,7 +3,7 @@ import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const root = fileURLToPath(new URL('../', import.meta.url));
+const root = fileURLToPath(new URL('../../', import.meta.url));
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const safePath = (value) => typeof value === 'string' && /^(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_.-]+$/.test(value)
     && !value.split('/').some((part) => part === '.' || part === '..');
@@ -109,7 +109,7 @@ async function build() {
 const expected = await build();
 if (process.argv.includes('--check')) {
     const actual = await readFile(path.join(root, 'index.json'), 'utf8');
-    if (actual !== expected) throw new Error('index.json differs from plugin metadata/content. Run npm run index and review the diff.');
+    if (actual !== expected) throw new Error('index.json differs from plugin metadata/content. Run node .github/scripts/store-index.mjs and review the diff.');
     console.log('Official store index and SHA-256 hashes validated.');
 } else {
     await writeFile(path.join(root, 'index.json'), expected);
