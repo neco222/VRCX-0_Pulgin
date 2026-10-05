@@ -19,7 +19,7 @@
       },
       "updatedAt": "2026-10-06",
       "entry": "plugins/user-status-stats/index.js",
-      "icon": "assets/icon.svg",
+      "icon": "plugins/user-status-stats/assets/icon.svg",
       "apiVersion": 1,
       "permissions": [
         "feed.read",
