@@ -4,7 +4,7 @@ VRCX-0の設定画面から機能を追加できる公式プラグインスト�
 
 ## はじめに
 
-**[Windows用セットアップEXEをダウンロード](https://github.com/neco222/VRCX-0_Pulgin/releases/download/bettervrcx0-v0.2.0/BetterVRCX0-Setup.exe)**
+**[Windows用セットアップEXEをダウンロード](https://github.com/neco222/VRCX-0_Pulgin/releases/download/bettervrcx0-v0.2.1/BetterVRCX0-Setup.exe)**
 
 1. VRCX-0を終了します。タスクトレイに残っている場合も終了してください。
 2. `BetterVRCX0-Setup.exe`を開き、**インストール / 更新 → 実行** を選びます。
@@ -18,7 +18,7 @@ VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選
 削除対象はBetterVRCX0のローダー・付属実行環境・専用ショートカットです。**VRCX-0本体、ログイン情報、履歴、VRCX-0の設定は削除しません。**
 プラグインごとの保存設定も消したい場合は、先にVRCX-0内の **Plugins → Installed → Uninstall** を使用してください。
 
-配布内容と確認用ハッシュは[リリースページ](https://github.com/neco222/VRCX-0_Pulgin/releases/tag/bettervrcx0-v0.2.0)にあります。現在のEXEにはコード署名がありません。
+配布内容と確認用ハッシュは[リリースページ](https://github.com/neco222/VRCX-0_Pulgin/releases/tag/bettervrcx0-v0.2.1)にあります。現在のEXEにはコード署名がありません。
 
 ## プラグインの使い方
 
@@ -35,7 +35,9 @@ VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選
 
 ## User Status Statistics
 
-ユーザー詳細画面の **Status Usage** タブに円グラフを追加します。変更回数ではなく、**そのステータスで過ごした時間**から割合を計算し、Offlineは除外します。
+各フレンドのユーザー詳細画面で **Activity** タブを開くと、**Status Usage** の円グラフとステータスごとの割合（%）を確認できます。変更回数ではなく、**そのステータスで過ごした時間**から割合を計算し、Offlineは除外します。
+
+表示されない場合は、**Settings → Plugins → Installed** でUser Status Statisticsを **ON** にしてください。既に導入済みの方は、上のセットアップEXEでローダーを更新し、Pluginsの **Check for updates → Update** からプラグインも更新できます。ON/OFFと保存設定は更新後も引き継ぎます。
 
 | ステータス | 色 |
 | --- | --- |
@@ -47,6 +49,7 @@ VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選
 期間は **7 days / 30 days / 90 days / All** から選べます。初期設定は30日です。
 Settingsで既定の期間を7・30・90日に変更でき、OFF → ONしたときに反映されます。
 VRCX-0に保存された履歴を使用するため、記録されていない期間は集計できません。
+旧ローダーではユーザー詳細画面の独立した **Status Usage** タブに表示されます。Activity内の表示には対応したBetterVRCX0への更新が必要です。
 
 ## ファイルの役割
 

@@ -18,7 +18,7 @@ async function setup(history, registration = () => async () => {}, defaultPeriod
     const context = vm.createContext({ registerPlugin(value) { plugin = value; } });
     vm.runInContext(source, context, { timeout: 1000 });
     await plugin.start({
-        ui: { async addUserDialogTab(value, compute) { descriptor = value; callback = compute; return registration(); } },
+        ui: { async addUserActivitySection(value, compute) { descriptor = value; callback = compute; return registration(); } },
         settings: { async get() { return defaultPeriod; }, async register() { return async () => {}; } },
         vrcx: { async queryFeed(value) { query = value; return history; } }
     });
@@ -35,6 +35,88 @@ test('requested example measures duration, not number of status events', async (
     assert.deepEqual(totals(result), { active: 3, 'join me': 2, 'ask me': 1.5, busy: 0.5 });
     assert.equal(result.totalMilliseconds, 7 * hour);
     assert.ok(Math.abs(result.data.reduce((sum, item) => sum + item.percentage, 0) - 100) < 1e-9);
+    assert.deepEqual(result.data.map((item) => Number(item.percentage.toFixed(1))), [42.9, 28.6, 21.4, 7.1]);
+});
+
+test('Activity registration is preferred and receives per-friend duration percentages', async () => {
+    let plugin;
+    let provider;
+    let removed = 0;
+    vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
+    const requested = [];
+    const ui = {
+        async addUserActivitySection(descriptor, compute) {
+            assert.equal(this, ui);
+            assert.equal(descriptor.id, 'status-usage');
+            assert.equal(descriptor.kind, 'status-statistics');
+            provider = compute;
+            return async () => { removed += 1; };
+        },
+        async addUserDialogTab() { assert.fail('Activity-capable loaders must not create a separate statistics tab'); }
+    };
+    await plugin.start({
+        ui,
+        settings: { async get() {}, async register() { return async () => {}; } },
+        vrcx: { async queryFeed(context) {
+            requested.push(context);
+            return { from: at(0), to: at(4), rows: [
+                row(at(0), 'Status', context.userId === 'usr_first' ? 'active' : 'busy'),
+                row(at(3), 'Offline')
+            ] };
+        } }
+    });
+    for (const [userId, status, period] of [['usr_first', 'active', 7], ['usr_second', 'busy', 90]]) {
+        const result = await provider({ userId, period });
+        assert.equal(result.data.find((item) => item.status === status).percentage, 100);
+        assert.equal(result.totalMilliseconds, 3 * hour);
+        assert.equal(result.offlineMilliseconds, hour);
+        assert.equal(result.periodLabel, `Past ${period} days`);
+    }
+    assert.deepEqual(JSON.parse(JSON.stringify(requested)), [{ userId: 'usr_first', period: 7 }, { userId: 'usr_second', period: 90 }]);
+    await plugin.stop();
+    assert.equal(removed, 1);
+    await assert.rejects(provider({ userId: 'usr_first', period: 30 }), /stopped/);
+});
+
+test('older loaders retain user-dialog registration fallback', async () => {
+    let plugin;
+    let registered = 0;
+    let removed = 0;
+    vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
+    await plugin.start({
+        settings: { async get() {}, async register() { return async () => {}; } },
+        ui: { async addUserDialogTab() { registered += 1; return async () => { removed += 1; }; } }
+    });
+    await plugin.stop();
+    assert.equal(registered, 1);
+    assert.equal(removed, 1);
+});
+
+test('Activity registration errors do not silently create another tab and release settings', async () => {
+    let plugin;
+    let removed = 0;
+    vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
+    await assert.rejects(plugin.start({
+        settings: { async get() {}, async register() { return async () => { removed += 1; }; } },
+        ui: {
+            async addUserActivitySection() { throw new Error('Activity adapter unavailable'); },
+            async addUserDialogTab() { assert.fail('A failing Activity adapter must surface its failure'); }
+        }
+    }), /Activity adapter unavailable/);
+    assert.equal(removed, 1);
+    await plugin.stop();
+    assert.equal(removed, 1);
+});
+
+test('missing host UI API reports compatibility failure and cleans settings', async () => {
+    let plugin;
+    let removed = 0;
+    vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
+    await assert.rejects(plugin.start({
+        settings: { async get() {}, async register() { return async () => { removed += 1; }; } },
+        ui: {}
+    }), /compatible user Activity adapter/);
+    assert.equal(removed, 1);
 });
 
 test('offline overnight is excluded and next Online previousStatus resolves new session', async () => {
@@ -137,7 +219,7 @@ test('start/stop/start cleans up once and callbacks reject when plugin stopped',
     let nextCallback;
     await subject.plugin.start({
         settings: { async get() { return 7; }, async register() { return async () => {}; } },
-        ui: { async addUserDialogTab(descriptor, callback) {
+        ui: { async addUserActivitySection(descriptor, callback) {
             assert.equal(descriptor.defaultPeriod, 7);
             nextCallback = callback;
             return async () => { cleaned += 1; };
@@ -149,7 +231,7 @@ test('start/stop/start cleans up once and callbacks reject when plugin stopped',
     assert.equal(cleaned, 2);
 });
 
-test('disable during registration disposes late tab and prevents stale callback', async () => {
+test('disable during registration disposes late Activity section and prevents stale callback', async () => {
     let plugin;
     let resolveRegistration;
     let cleaned = 0;
@@ -157,7 +239,7 @@ test('disable during registration disposes late tab and prevents stale callback'
     vm.runInContext(source, context, { timeout: 1000 });
     const starting = plugin.start({
         settings: { async get() {}, async register() { return async () => {}; } },
-        ui: { addUserDialogTab: () => new Promise((resolve) => { resolveRegistration = resolve; }) }
+        ui: { addUserActivitySection: () => new Promise((resolve) => { resolveRegistration = resolve; }) }
     });
     while (!resolveRegistration) await Promise.resolve();
     await plugin.stop();
@@ -178,13 +260,13 @@ test('saved default period is read from namespaced plugin settings; invalid defa
     }
 });
 
-test('failed tab registration releases registered settings UI', async () => {
+test('failed Activity section registration releases registered settings UI', async () => {
     let plugin;
     let cleaned = 0;
     vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
     await assert.rejects(plugin.start({
         settings: { async get() {}, async register() { return async () => { cleaned += 1; }; } },
-        ui: { async addUserDialogTab() { throw new Error('Adapter unavailable'); } }
+        ui: { async addUserActivitySection() { throw new Error('Adapter unavailable'); } }
     }), /Adapter unavailable/);
     await plugin.stop();
     assert.equal(cleaned, 1);
@@ -196,8 +278,8 @@ test('stop attempts both cleanup handlers even if one fails', async () => {
     vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
     await plugin.start({
         settings: { async get() {}, async register() { return async () => { cleanedSettings += 1; }; } },
-        ui: { async addUserDialogTab() { return async () => { throw new Error('Tab cleanup failed'); }; } }
+        ui: { async addUserActivitySection() { return async () => { throw new Error('Section cleanup failed'); }; } }
     });
-    await assert.rejects(plugin.stop(), /Tab cleanup failed/);
+    await assert.rejects(plugin.stop(), /Section cleanup failed/);
     assert.equal(cleanedSettings, 1);
 });

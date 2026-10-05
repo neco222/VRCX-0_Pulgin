@@ -1,9 +1,9 @@
 {
   "id": "user-status-stats",
   "name": "User Status Statistics",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "VRCX-0 Plugin Store",
-  "description": "Displays observed online status durations in a pie chart, excluding offline time.",
+  "description": "Displays online status duration percentages in each friend's Activity tab, excluding offline time.",
   "updatedAt": "2026-10-05",
   "entry": "index.js",
   "icon": "assets/icon.svg",

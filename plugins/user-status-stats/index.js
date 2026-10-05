@@ -112,7 +112,13 @@
                     if (settingsRegistration) await settingsRegistration();
                     return;
                 }
-                const registration = await api.ui.addUserDialogTab({
+                // Host adapters own native Activity placement and chart rendering.
+                // Older loaders still expose the original user-dialog API.
+                const addSection = typeof api.ui.addUserActivitySection === 'function'
+                    ? api.ui.addUserActivitySection
+                    : api.ui.addUserDialogTab;
+                if (typeof addSection !== 'function') throw new Error('Status Statistics requires a compatible user Activity adapter');
+                const registration = await addSection.call(api.ui, {
                     id: 'status-usage',
                     title: 'Status Usage',
                     kind: 'status-statistics',

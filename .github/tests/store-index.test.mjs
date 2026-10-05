@@ -55,14 +55,16 @@ test('version bumps keep approved old hashes, and explicit releases list can rev
         const manifestPath = path.join(fixture, 'plugins/user-status-stats/manifest.json');
         const before = JSON.parse(await readFile(indexPath, 'utf8')).plugins[0];
         const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-        manifest.version = '1.1.0';
+        const version = manifest.version.split('.').map(Number);
+        version[2] += 1;
+        manifest.version = version.join('.');
         await writeFile(manifestPath, JSON.stringify(manifest));
         await appendFile(path.join(fixture, 'plugins/user-status-stats/index.js'), '\n// reviewed new release\n');
         const generate = () => spawnSync(process.execPath, [path.join(fixture, '.github/scripts/store-index.mjs')], { encoding: 'utf8' });
         const updated = generate();
         assert.equal(updated.status, 0, updated.stderr);
         const after = JSON.parse(await readFile(indexPath, 'utf8')).plugins[0];
-        assert.deepEqual(after.releases, [{ version: before.version, entry: before.entry, sha256: before.sha256, permissions: before.permissions }]);
+        assert.deepEqual(after.releases, [...(before.releases ?? []), { version: before.version, entry: before.entry, sha256: before.sha256, permissions: before.permissions }]);
         assert.notEqual(after.sha256, before.sha256);
         manifest.releases = [];
         await writeFile(manifestPath, JSON.stringify(manifest));
