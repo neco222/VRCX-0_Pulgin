@@ -4,7 +4,7 @@ VRCX-0の設定画面から機能を追加できる公式プラグインスト�
 
 ## はじめに
 
-**[Windows用セットアップEXEをダウンロード](https://github.com/neco222/VRCX-0_Pulgin/releases/download/bettervrcx0-v0.2.2/BetterVRCX0-Setup.exe)**
+**[Windows用セットアップEXEをダウンロード](https://github.com/neco222/VRCX-0_Pulgin/releases/download/bettervrcx0-v0.2.3/BetterVRCX0-Setup.exe)**
 
 1. VRCX-0を終了します。タスクトレイに残っている場合も終了してください。
 2. `BetterVRCX0-Setup.exe`を開き、**インストール / 更新 → 実行** を選びます。
@@ -18,7 +18,7 @@ VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選
 削除対象はBetterVRCX0のローダー・付属実行環境・専用ショートカットです。**VRCX-0本体、ログイン情報、履歴、VRCX-0の設定は削除しません。**
 プラグインごとの保存設定も消したい場合は、先にVRCX-0内の **Plugins → Installed → Uninstall** を使用してください。
 
-配布内容と確認用ハッシュは[リリースページ](https://github.com/neco222/VRCX-0_Pulgin/releases/tag/bettervrcx0-v0.2.2)にあります。現在のEXEにはコード署名がありません。
+配布内容と確認用ハッシュは[リリースページ](https://github.com/neco222/VRCX-0_Pulgin/releases/tag/bettervrcx0-v0.2.3)にあります。現在のEXEにはコード署名がありません。
 
 ## プラグインの使い方
 
@@ -33,11 +33,13 @@ VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選
 | Update    | 新しいバージョンがある場合に更新します。                     |
 | Uninstall | プラグインと保存された設定を削除します。                     |
 
-## User Status Statistics
+## BetterActivity
 
-各フレンドのユーザー詳細画面で **Activity** タブを開くと、**Status Usage** の円グラフとステータスごとの割合（%）を確認できます。変更回数ではなく、**そのステータスで過ごした時間**から割合を計算し、Offlineは除外します。
+各フレンドのユーザー詳細画面で **Activity** タブを開くと、ステータス利用時間の円グラフと割合（%）を確認できます。変更回数ではなく、**そのステータスで過ごした時間**から割合を計算し、Offlineは除外します。
 
-表示されない場合は、**Settings → Plugins → Installed** でUser Status Statisticsを **ON** にしてください。既に導入済みの方は、上のセットアップEXEでローダーを更新し、Pluginsの **Check for updates → Update** からプラグインも更新できます。ON/OFFと保存設定は更新後も引き継ぎます。
+VRCX-0の言語が日本語ならBetterActivityの画面は日本語、その他の言語なら英語で表示します。ストア、Installed一覧、円グラフの凡例や説明も言語設定に追従します。
+
+表示されない場合は、**設定 → プラグイン → インストール済み** でBetterActivityを **ON** にしてください。既に導入済みの方は、上のセットアップEXEでローダーを更新し、プラグインの **更新を確認 → 更新** からプラグインも更新できます。ON/OFFは更新後も引き継ぎます。
 
 | ステータス | 色       |
 | ---------- | -------- |
@@ -48,7 +50,7 @@ VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選
 
 期間はプラグイン独自のボタンを追加せず、VRCX-0のActivity画面に備え付けの期間選択（7 / 30 / 90 / 180 / 365日・全期間）に連動します。
 VRCX-0に保存された履歴を使用するため、記録されていない期間は集計できません。
-旧ローダーではユーザー詳細画面の独立した **Status Usage** タブに表示されます。Activity内の表示には対応したBetterVRCX0への更新が必要です。
+日本語以外のVRCX-0では英語で表示します。
 
 ## ファイルの役割
 

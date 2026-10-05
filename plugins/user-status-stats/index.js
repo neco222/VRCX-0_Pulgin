@@ -129,13 +129,13 @@
             : api.ui.addUserDialogTab;
         if (typeof addSection !== "function")
           throw new Error(
-            "Status Statistics requires a compatible user Activity adapter",
+            "BetterActivity requires a compatible user Activity adapter",
           );
         const registration = await addSection.call(
           api.ui,
           {
             id: "status-usage",
-            title: "ステータス利用時間",
+            title: "BetterActivity",
             kind: "status-statistics",
             periods: [7, 30, 90, 180, 365, "all"],
             defaultPeriod: 30,
