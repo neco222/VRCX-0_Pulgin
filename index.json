@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "plugins": [
+    {
+      "id": "user-status-stats",
+      "name": "User Status Statistics",
+      "version": "1.0.0",
+      "author": "VRCX-0 Plugin Store",
+      "description": "Displays observed online status durations in a pie chart, excluding offline time.",
+      "updatedAt": "2026-10-05",
+      "apiVersion": 1,
+      "entry": "plugins/user-status-stats/index.js",
+      "manifest": "plugins/user-status-stats/manifest.json",
+      "sha256": "56c9d4be2e62a9289321e5e642edc091b58611c855c0a4f1cd47927c0d03527b",
+      "icon": "plugins/user-status-stats/assets/icon.svg",
+      "permissions": [
+        "feed.read",
+        "userDialog.modify",
+        "settings.create",
+        "storage"
+      ],
+      "files": {
+        "plugins/user-status-stats/assets/icon.svg": "e6284c85dd68b3623723052abf2d2f5fc4873dfbeba72e1a317d087e9d443b20",
+        "plugins/user-status-stats/index.js": "56c9d4be2e62a9289321e5e642edc091b58611c855c0a4f1cd47927c0d03527b",
+        "plugins/user-status-stats/manifest.json": "19dc22c48d3b07fd4cec831d1ca0e300a0930ef30ccead0c8cdc8498ef7f648e"
+      }
+    }
+  ]
+}
