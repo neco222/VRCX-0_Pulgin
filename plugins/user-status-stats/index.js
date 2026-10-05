@@ -112,7 +112,7 @@
     };
   }
 
-  let dispose = null;
+  let disposals = [];
   let active = false;
   let generation = 0;
   registerPlugin({
@@ -131,7 +131,29 @@
           throw new Error(
             "BetterActivity requires a compatible user Activity adapter",
           );
-        const registration = await addSection.call(
+        const provider = async ({ userId, period = 30 }, own = false) => {
+          if (!active || generation !== ownGeneration)
+            throw new Error("Plugin is stopped");
+          const selected = [7, 30, 90, 180, 365, "all"].includes(period)
+            ? period
+            : 30;
+          const history = await (own ? api.vrcx.queryOwnFeed : api.vrcx.queryFeed)({
+            userId,
+            period: selected,
+          });
+          if (!active || generation !== ownGeneration)
+            throw new Error("Plugin is stopped");
+          return {
+            ...calculateUsage(history.rows, history.from, history.to),
+            coverage: history.coverage,
+            periodLabel:
+              selected === "all"
+                ? "All recorded history"
+                : `Past ${selected} days`,
+          };
+        };
+        const registrations = [];
+        registrations.push(await addSection.call(
           api.ui,
           {
             id: "status-usage",
@@ -141,30 +163,23 @@
             defaultPeriod: 30,
             periodSource: "activity",
           },
-          async ({ userId, period = 30 }) => {
-            if (!active || generation !== ownGeneration)
-              throw new Error("Plugin is stopped");
-            const selected = [7, 30, 90, 180, 365, "all"].includes(period)
-              ? period
-              : 30;
-            const history = await api.vrcx.queryFeed({
-              userId,
-              period: selected,
-            });
-            if (!active || generation !== ownGeneration)
-              throw new Error("Plugin is stopped");
-            return {
-              ...calculateUsage(history.rows, history.from, history.to),
-              coverage: history.coverage,
-              periodLabel:
-                selected === "all"
-                  ? "All recorded history"
-                  : `Past ${selected} days`,
-            };
-          },
-        );
-        if (active && generation === ownGeneration) dispose = registration;
-        else if (registration) await registration();
+          (context) => provider(context, false),
+        ));
+        if (typeof api.ui.addOwnActivitySection === "function") {
+          registrations.push(await api.ui.addOwnActivitySection(
+            {
+              id: "own-status-usage",
+              title: "BetterActivity",
+              kind: "status-statistics",
+              periods: [30, 90, 180, 365, "all"],
+              defaultPeriod: 30,
+              periodSource: "activity-page",
+            },
+            (context) => provider(context, true),
+          ));
+        }
+        if (active && generation === ownGeneration) disposals = registrations;
+        else await Promise.allSettled(registrations.map((registration) => registration()));
       } catch (error) {
         if (generation === ownGeneration) {
           active = false;
@@ -175,10 +190,10 @@
     async stop() {
       active = false;
       ++generation;
-      const cleanup = dispose;
-      dispose = null;
+      const cleanup = disposals;
+      disposals = [];
       const results = await Promise.allSettled(
-        [cleanup].filter(Boolean).map(async (remove) => {
+        cleanup.reverse().map(async (remove) => {
           await remove();
         }),
       );

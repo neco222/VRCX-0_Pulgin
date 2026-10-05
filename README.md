@@ -4,25 +4,25 @@ VRCX-0の設定画面から機能を追加できる公式プラグインスト�
 
 ## はじめに
 
-**[Windows用セットアップEXEをダウンロード](https://github.com/neco222/VRCX-0_Pulgin/releases/download/bettervrcx0-v0.2.3/BetterVRCX0-Setup.exe)**
+**[BetterDiscord-Setup.exeをダウンロード](https://github.com/neco222/VRCX-0_Pulgin/releases/download/betterdiscord-v0.2.4/BetterDiscord-Setup.exe)**
 
 1. VRCX-0を終了します。タスクトレイに残っている場合も終了してください。
-2. `BetterVRCX0-Setup.exe`を開き、**インストール / 更新 → 実行** を選びます。
-3. スタートメニューの **BetterVRCX0** からVRCX-0を起動します。
+2. `BetterDiscord-Setup.exe`を開き、 **インストール / 更新 → 実行** を選びます。
+3. セットアップが作成したVRCX-0起動ショートカットから起動します。
 
 必要な実行環境はEXEに同梱されています。VRCX-0が自動検出されない場合だけ、参照ボタンで既存の実行ファイルを選んでください。初回導入後のプラグイン操作はVRCX-0内で行えます。
 
 ### プラグイン機能全体を削除する場合
 
-VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選びます。Windowsの「インストールされているアプリ」のBetterVRCX0からも開けます。
-削除対象はBetterVRCX0のローダー・付属実行環境・専用ショートカットです。**VRCX-0本体、ログイン情報、履歴、VRCX-0の設定は削除しません。**
+VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選びます。Windowsの「インストールされているアプリ」の **BetterDiscord** からも開けます。
+削除対象はBetterDiscordのローダー・付属実行環境・専用ショートカットです。**VRCX-0本体、ログイン情報、履歴、VRCX-0の設定は削除しません。**
 プラグインごとの保存設定も消したい場合は、先にVRCX-0内の **Plugins → Installed → Uninstall** を使用してください。
 
-配布内容と確認用ハッシュは[リリースページ](https://github.com/neco222/VRCX-0_Pulgin/releases/tag/bettervrcx0-v0.2.3)にあります。現在のEXEにはコード署名がありません。
+配布内容と確認用ハッシュは[リリースページ](https://github.com/neco222/VRCX-0_Pulgin/releases/tag/betterdiscord-v0.2.4)にあります。現在のEXEにはコード署名がありません。
 
 ## プラグインの使い方
 
-1. BetterVRCX0から起動したVRCX-0で、**Settings → Plugins → Store** を開きます。
+1. BetterDiscordから起動したVRCX-0で、**Settings → Plugins → Store** を開きます。
 2. 検索欄からプラグインを探し、**Install** を押します。
 3. **Installed** で、インストール済みプラグインを管理します。
 

@@ -1,22 +1,22 @@
 {
   "id": "user-status-stats",
   "name": "BetterActivity",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": "VRCX-0 Plugin Store",
-  "description": "Displays each friend's observed online status durations in the Activity tab, excluding offline time.",
+  "description": "Displays your and your friends' observed online status durations in Activity, excluding offline time.",
   "localized": {
     "ja": {
       "name": "BetterActivity",
-      "description": "フレンドのステータス利用時間を、オフライン時間を除外してアクティビティ画面に表示します。"
+      "description": "自分とフレンドのステータス利用時間を、オフライン時間を除外してアクティビティ画面に表示します。"
     },
     "en": {
       "name": "BetterActivity",
-      "description": "Displays each friend's observed online status durations in the Activity tab, excluding offline time."
+      "description": "Displays your and your friends' observed online status durations in Activity, excluding offline time."
     }
   },
   "updatedAt": "2026-10-06",
   "entry": "index.js",
   "icon": "assets/icon.svg",
   "apiVersion": 1,
-  "permissions": ["feed.read", "userDialog.modify"]
+  "permissions": ["feed.read", "userDialog.modify", "activityPage.modify"]
 }
