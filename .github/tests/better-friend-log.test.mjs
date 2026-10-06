@@ -36,7 +36,7 @@ const evidence = (overrides = {}) => ({
     relationships: [friend(target, addedAt), friend(alice)],
     feedRows: [feed(target), feed(alice)],
     hiddenUserIds: [],
-    mutualFriends: { available: true, userIds: [] },
+    mutualFriends: { available: true, userIds: [alice] },
     encounter: null,
     ...overrides,
 });
@@ -79,7 +79,7 @@ async function harness(value) {
 test('GPS command rows establish online co-presence without an Online seed', async () => {
     const active = await harness(evidence());
     const result = await active.query();
-    assert.deepEqual(result.entries[0].introducedBy, [{ userId: alice, displayName: 'Alice', evidence: ['co-presence'], relationshipKnown: true }]);
+    assert.deepEqual(result.entries[0].introducedBy, [{ userId: alice, displayName: 'Alice', evidence: ['co-presence', 'mutual-friend'], relationshipKnown: true }]);
     assert.equal(result.entries[0].location, world);
     await active.plugin.stop();
     assert.equal(active.disposed(), 1);
@@ -96,7 +96,7 @@ test('native GameLog session finds introductions when target has no pre-friend G
     assert.equal(entry.location, world);
 });
 
-test('mutual friends corroborate co-presence and rank before co-presence alone', async () => {
+test('only the intersection of common friends and same-instance presence is returned', async () => {
     const active = await harness(evidence({
         friends: [person(target, 'Target', 50), person(alice, 'Alice'), person(bob, 'Bob'), person(charlie, 'Charlie')],
         relationships: [friend(target, addedAt), friend(alice), friend(bob), friend(charlie)],
@@ -104,9 +104,10 @@ test('mutual friends corroborate co-presence and rank before co-presence alone',
         mutualFriends: { available: true, userIds: [bob, charlie] },
     }));
     const entry = (await active.query()).entries[0];
-    assert.deepEqual(entry.introducedBy.map((row) => [row.userId, row.evidence]), [[bob, ['co-presence', 'mutual-friend']], [alice, ['co-presence']]]);
+    assert.deepEqual(entry.introducedBy.map((row) => [row.userId, row.evidence]), [[bob, ['co-presence', 'mutual-friend']]]);
     assert.deepEqual(entry.mutualOnly, []);
     assert.ok(!JSON.stringify(entry).includes(charlie));
+    assert.ok(!JSON.stringify(entry).includes(alice));
 });
 
 test('current common friends without same-instance evidence are not returned for display', async () => {
@@ -128,12 +129,46 @@ test('missing original friendship time cannot generate candidates from common fr
     }
 });
 
-test('Unavailable mutual data cannot be mistaken for positive common-friend evidence', async () => {
+test('unavailable mutual data fails closed even with same-instance evidence', async () => {
     const active = await harness(evidence({ mutualFriends: { available: false, userIds: [alice] } }));
     const result = await active.query();
     assert.equal(result.mutualAvailable, false);
-    assert.deepEqual(result.entries[0].introducedBy[0].evidence, ['co-presence']);
+    assert.deepEqual(result.entries[0].introducedBy, []);
     assert.deepEqual(result.entries[0].mutualOnly, []);
+});
+
+test('same-instance evidence alone is not enough when the user is not a common friend', async () => {
+    for (const scene of [{ feedRows: [feed(target), feed(alice)] }, { feedRows: [], encounter: encounter([player(target), player(alice)]) }]) {
+        const active = await harness(evidence({ ...scene, mutualFriends: { available: true, userIds: [] } }));
+        const entry = (await active.query()).entries[0];
+        assert.deepEqual(entry.introducedBy, []);
+        assert.deepEqual(entry.mutualOnly, []);
+        assert.ok(!JSON.stringify(entry).includes(alice));
+    }
+});
+
+test('missing or malformed mutual-friend payloads cannot create candidates', async () => {
+    for (const mutualFriends of [undefined, null, {}, { available: 'true', userIds: [alice] }, { available: true }, { available: true, userIds: alice }, { available: true, userIds: { userId: alice } }, { available: true, userIds: [null, 2, { userId: alice }] }]) {
+        const active = await harness(evidence({ mutualFriends }));
+        const entry = (await active.query()).entries[0];
+        assert.deepEqual(entry.introducedBy, []);
+        assert.deepEqual(entry.mutualOnly, []);
+    }
+});
+
+test('multiple common friends with same-instance evidence are displayed with both evidence types', async () => {
+    const active = await harness(evidence({
+        friends: [person(target, 'Target', 50), person(bob, 'Bob'), person(alice, 'Alice')],
+        relationships: [friend(target, addedAt), friend(alice), friend(bob)],
+        feedRows: [feed(target), feed(alice), feed(bob)],
+        mutualFriends: { available: true, userIds: [bob, alice] },
+    }));
+    const entry = (await active.query()).entries[0];
+    assert.deepEqual(entry.introducedBy, [
+        { userId: alice, displayName: 'Alice', evidence: ['co-presence', 'mutual-friend'], relationshipKnown: true },
+        { userId: bob, displayName: 'Bob', evidence: ['co-presence', 'mutual-friend'], relationshipKnown: true },
+    ]);
+    assert.deepEqual(entry.mutualOnly, []);
 });
 
 test('Offline wins over GPS at the same timestamp regardless of input row order', async () => {

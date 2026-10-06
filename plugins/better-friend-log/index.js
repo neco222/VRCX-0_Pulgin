@@ -152,18 +152,18 @@
       // Do not combine candidates from a stale second location with the
       // currently validated local game session.
       const inFeed = targetFeedLocation && personFeed?.location === targetFeedLocation && !personLeftAfterGps && (!targetInEncounter || targetFeedLocation === encounter.location);
-      if (relationship.eligible && (inEncounter || inFeed)) {
-        introducedBy.push({ userId: id, displayName, evidence: mutual.has(id) ? ["co-presence", "mutual-friend"] : ["co-presence"], relationshipKnown: relationship.known });
+      if (relationship.eligible && mutual.has(id) && (inEncounter || inFeed)) {
+        introducedBy.push({ userId: id, displayName, evidence: ["co-presence", "mutual-friend"], relationshipKnown: relationship.known });
       }
     }
-    introducedBy.sort((a, b) => Number(b.evidence.includes("mutual-friend")) - Number(a.evidence.includes("mutual-friend")) || a.displayName.localeCompare(b.displayName));
+    introducedBy.sort((a, b) => a.displayName.localeCompare(b.displayName));
     const entry = {
       friendUserId: requestedUserId,
       friendName: text(target, "displayName", "display_name") || requestedUserId,
       addedAt: validAddedAt ? new Date(at).toISOString() : null,
       introducedBy,
       // Keep the renderer contract while never displaying mutual-only people.
-      // Mutual friends only corroborate and rank candidates with co-presence.
+      // Candidates require both mutual-friend and co-presence evidence.
       mutualOnly: [],
     };
     if (sharedLocation) entry.location = sharedLocation;
