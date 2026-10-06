@@ -4,7 +4,7 @@ VRCX-0の設定画面から機能を追加できる公式プラグインスト�
 
 ## はじめに
 
-**[BetterDiscord-Setup.exeをダウンロード](https://github.com/neco222/VRCX-0_Pulgin/releases/download/betterdiscord-v0.2.6/BetterDiscord-Setup.exe)**
+**[BetterDiscord-Setup.exeをダウンロード](https://github.com/neco222/VRCX-0_Pulgin/releases/download/betterdiscord-v0.2.7/BetterDiscord-Setup.exe)**
 
 1. VRCX-0を終了します。タスクトレイに残っている場合も終了してください。
 2. `BetterDiscord-Setup.exe`を開き、 **インストール / 更新 → 実行** を選びます。
@@ -18,7 +18,7 @@ VRCX-0を終了し、同じEXEで **アンインストール → 実行** を選
 削除対象はBetterDiscordのローダー・付属実行環境・専用ショートカットです。**VRCX-0本体、ログイン情報、履歴、VRCX-0の設定は削除しません。**
 プラグインごとの保存設定も消したい場合は、先にVRCX-0内の **Plugins → Installed → Uninstall** を使用してください。
 
-配布内容と確認用ハッシュは[リリースページ](https://github.com/neco222/VRCX-0_Pulgin/releases/tag/betterdiscord-v0.2.6)にあります。現在のEXEにはコード署名がありません。
+配布内容と確認用ハッシュは[リリースページ](https://github.com/neco222/VRCX-0_Pulgin/releases/tag/betterdiscord-v0.2.7)にあります。現在のEXEにはコード署名がありません。
 
 ## プラグインの使い方
 
@@ -54,9 +54,9 @@ VRCX-0に保存された履歴を使用するため、記録されていない�
 
 ## BetterFriendLog
 
-BetterDiscord v0.2.6以降が必要です。古いローダーをお使いの場合は、上のセットアップEXEで更新してください。
+BetterDiscord v0.2.7以降が必要です。古いローダーをお使いの場合は、上のセットアップEXEで更新してください。
 
-メイン画面の **アクティビティ** にある概要の下へ「フレンドログ」を追加し、新しくフレンドになった人と同じインスタンスにいた既存フレンドを表示します。複数人が該当する場合は全員表示します。VRCX-0に記録されたフレンド追加・インスタンス履歴だけを使用し、位置情報を非表示にしたユーザーは推定から除外します。
+各フレンドのユーザー詳細にある **情報 → アクティビティ概要** の直下へ「フレンドログ」を追加し、その人とフレンドになった時に同じインスタンスにいた既存フレンドを表示します。複数人が該当する場合は全員表示します。VRCX-0に記録されたフレンド追加・インスタンス履歴だけを使用し、位置情報を非表示にしたユーザーは推定から除外します。
 
 表示は履歴からの推定であり、実際に紹介した人と一致しない場合があります。VRCX-0で記録を開始する前に追加済みだったフレンドや、同席履歴が残っていないフレンドは表示されません。表示言語はVRCX-0が日本語なら日本語、それ以外なら英語です。
 

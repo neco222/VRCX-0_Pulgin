@@ -5,7 +5,7 @@
 
   registerPlugin({
     async start(api) {
-      dispose = await api.ui.addOwnActivitySection(
+      dispose = await api.ui.addUserActivitySummarySection(
         {
           id: "friend-introductions",
           title: "BetterFriendLog",
@@ -14,7 +14,7 @@
           periods: ["all"],
           defaultPeriod: "all",
         },
-        () => api.vrcx.queryFriendIntroductions(),
+        ({ userId }) => api.vrcx.queryFriendIntroductions(userId),
       );
     },
     async stop() {

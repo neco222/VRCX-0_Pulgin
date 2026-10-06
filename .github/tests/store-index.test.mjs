@@ -73,7 +73,7 @@ test('version bumps keep approved old hashes, and explicit releases list can rev
         await writeFile(manifestPath, JSON.stringify(manifest));
         const revoked = generate();
         assert.equal(revoked.status, 0, revoked.stderr);
-        assert.equal(JSON.parse(await readFile(indexPath, 'utf8')).plugins[0].releases, undefined);
+        assert.equal(JSON.parse(await readFile(indexPath, 'utf8')).plugins.find((plugin) => plugin.id === 'user-status-stats').releases, undefined);
     } finally {
         const absolute = path.resolve(fixture);
         assert.ok(absolute.startsWith(path.resolve(os.tmpdir()) + path.sep));
