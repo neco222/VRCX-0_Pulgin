@@ -1,5 +1,21 @@
 name: Validate official plugin store
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/**'
+      - 'plugins/**'
+      - 'index.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/**'
+      - 'plugins/**'
+      - 'index.json'
+  workflow_dispatch:
+concurrency:
+  group: validate-store-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   validate:
     runs-on: ubuntu-latest

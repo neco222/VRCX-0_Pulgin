@@ -64,7 +64,10 @@ test('version bumps keep approved old hashes, and explicit releases list can rev
         const updated = generate();
         assert.equal(updated.status, 0, updated.stderr);
         const after = JSON.parse(await readFile(indexPath, 'utf8')).plugins[0];
-        assert.deepEqual(after.releases, [...(before.releases ?? []), { version: before.version, entry: before.entry, sha256: before.sha256, permissions: before.permissions }]);
+        assert.deepEqual(after.releases, [
+            ...(before.releases ?? []).filter((release) => release.version !== before.version),
+            { version: before.version, entry: before.entry, sha256: before.sha256, permissions: before.permissions }
+        ]);
         assert.notEqual(after.sha256, before.sha256);
         manifest.releases = [];
         await writeFile(manifestPath, JSON.stringify(manifest));

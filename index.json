@@ -4,7 +4,7 @@
     {
       "id": "user-status-stats",
       "name": "BetterActivity",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "author": "VRCX-0 Plugin Store",
       "description": "Displays your and your friends' observed online status durations in Activity, excluding offline time.",
       "localized": {
@@ -18,32 +18,22 @@
         }
       },
       "updatedAt": "2026-10-06",
-      "entry": "plugins/user-status-stats/index.js",
-      "icon": "plugins/user-status-stats/assets/icon.svg",
       "apiVersion": 1,
+      "entry": "plugins/user-status-stats/index.js",
+      "manifest": "plugins/user-status-stats/manifest.json",
+      "sha256": "801fb33e30416e9e712d154b22a866b9f17860f2e7df32ec2419ab532d3b4907",
+      "icon": "plugins/user-status-stats/assets/icon.svg",
       "permissions": [
         "feed.read",
         "userDialog.modify",
         "activityPage.modify"
       ],
-      "manifest": "plugins/user-status-stats/manifest.json",
-      "sha256": "74f67d5bf2d24347c8057b18301bf4c10f7649d70e58bcab8acf6090457334b8",
       "files": {
-        "plugins/user-status-stats/index.js": "74f67d5bf2d24347c8057b18301bf4c10f7649d70e58bcab8acf6090457334b8",
-        "plugins/user-status-stats/manifest.json": "c14944e5f4320c717d31da8aa06de67e7b5bd90770d691d7c44526284b032634",
-        "plugins/user-status-stats/assets/icon.svg": "e6284c85dd68b3623723052abf2d2f5fc4873dfbeba72e1a317d087e9d443b20"
+        "plugins/user-status-stats/assets/icon.svg": "e6284c85dd68b3623723052abf2d2f5fc4873dfbeba72e1a317d087e9d443b20",
+        "plugins/user-status-stats/index.js": "801fb33e30416e9e712d154b22a866b9f17860f2e7df32ec2419ab532d3b4907",
+        "plugins/user-status-stats/manifest.json": "4e313ba9c6e986f1784ea6e8e061045b0fbd7b0af3e4b55073a80be92c78658e"
       },
       "releases": [
-        {
-          "version": "1.4.0",
-          "entry": "plugins/user-status-stats/index.js",
-          "sha256": "74f67d5bf2d24347c8057b18301bf4c10f7649d70e58bcab8acf6090457334b8",
-          "permissions": [
-            "feed.read",
-            "userDialog.modify",
-            "activityPage.modify"
-          ]
-        },
         {
           "version": "1.0.0",
           "entry": "plugins/user-status-stats/index.js",
@@ -82,6 +72,16 @@
             "userDialog.modify",
             "settings.create",
             "storage"
+          ]
+        },
+        {
+          "version": "1.4.0",
+          "entry": "plugins/user-status-stats/index.js",
+          "sha256": "74f67d5bf2d24347c8057b18301bf4c10f7649d70e58bcab8acf6090457334b8",
+          "permissions": [
+            "feed.read",
+            "userDialog.modify",
+            "activityPage.modify"
           ]
         }
       ]

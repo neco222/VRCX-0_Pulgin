@@ -1,7 +1,7 @@
 {
   "id": "user-status-stats",
   "name": "BetterActivity",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "VRCX-0 Plugin Store",
   "description": "Displays your and your friends' observed online status durations in Activity, excluding offline time.",
   "localized": {

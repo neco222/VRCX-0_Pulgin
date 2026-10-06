@@ -120,6 +120,7 @@
       if (active) return;
       active = true;
       const ownGeneration = ++generation;
+      const registrations = [];
       try {
         // Host adapters own native Activity placement and chart rendering.
         // Older loaders still expose the original user-dialog API.
@@ -152,7 +153,6 @@
                 : `Past ${selected} days`,
           };
         };
-        const registrations = [];
         registrations.push(await addSection.call(
           api.ui,
           {
@@ -184,6 +184,7 @@
         if (generation === ownGeneration) {
           active = false;
         }
+        await Promise.allSettled(registrations.reverse().map((registration) => registration()));
         throw error;
       }
     },

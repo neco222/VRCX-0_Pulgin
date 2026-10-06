@@ -92,14 +92,15 @@ test('older loaders retain user-dialog registration fallback', async () => {
     assert.equal(removed, 1);
 });
 
-test('Activity registration errors do not silently create another tab and release settings', async () => {
+test('own Activity registration failure releases the already registered friend Activity section', async () => {
     let plugin;
     let removed = 0;
     vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
     await assert.rejects(plugin.start({
-        settings: { async get() {}, async register() { return async () => { removed += 1; }; } },
+        settings: { async get() {}, async register() { assert.fail('BetterActivity uses native Activity periods, not custom settings'); } },
         ui: {
-            async addUserActivitySection() { throw new Error('Activity adapter unavailable'); },
+            async addUserActivitySection() { return async () => { removed += 1; }; },
+            async addOwnActivitySection() { throw new Error('Activity adapter unavailable'); },
             async addUserDialogTab() { assert.fail('A failing Activity adapter must surface its failure'); }
         }
     }), /Activity adapter unavailable/);
@@ -108,15 +109,15 @@ test('Activity registration errors do not silently create another tab and releas
     assert.equal(removed, 1);
 });
 
-test('missing host UI API reports compatibility failure and cleans settings', async () => {
+test('missing host UI API reports compatibility failure without registering settings', async () => {
     let plugin;
     let removed = 0;
     vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
     await assert.rejects(plugin.start({
-        settings: { async get() {}, async register() { return async () => { removed += 1; }; } },
+        settings: { async get() {}, async register() { assert.fail('BetterActivity uses native Activity periods, not custom settings'); } },
         ui: {}
     }), /compatible user Activity adapter/);
-    assert.equal(removed, 1);
+    assert.equal(removed, 0);
 });
 
 test('offline overnight is excluded and next Online previousStatus resolves new session', async () => {
@@ -196,9 +197,9 @@ test('inconsistent previousStatus does not attribute an undocumented interval', 
 
 test('empty history, zero-length intervals, period selection and permission-limited API', async () => {
     const subject = await setup({ from: at(0), to: at(0), rows: [], coverage: { complete: true } });
-    assert.deepEqual([...subject.descriptor.periods], [7, 30, 90, 'all']);
+    assert.deepEqual([...subject.descriptor.periods], [7, 30, 90, 180, 365, 'all']);
     assert.equal(subject.descriptor.defaultPeriod, 30);
-    for (const period of [7, 30, 90, 'all']) {
+    for (const period of [7, 30, 90, 180, 365, 'all']) {
         const result = await subject.compute(period);
         assert.equal(result.totalMilliseconds, 0);
         assert.equal(subject.query().period, period);
@@ -220,7 +221,7 @@ test('start/stop/start cleans up once and callbacks reject when plugin stopped',
     await subject.plugin.start({
         settings: { async get() { return 7; }, async register() { return async () => {}; } },
         ui: { async addUserActivitySection(descriptor, callback) {
-            assert.equal(descriptor.defaultPeriod, 7);
+            assert.equal(descriptor.defaultPeriod, 30);
             nextCallback = callback;
             return async () => { cleaned += 1; };
         } },
@@ -253,33 +254,70 @@ test('invalid period boundaries reject instead of presenting misleading totals',
     await assert.rejects(subject.compute(), /Invalid status-history interval/);
 });
 
-test('saved default period is read from namespaced plugin settings; invalid defaults fall back to 30', async () => {
-    for (const [saved, expected] of [[7, 7], [90, 90], [365, 30], ['all', 30]]) {
-        const subject = await setup({ from: at(0), to: at(1), rows: [] }, undefined, saved);
-        assert.equal(subject.descriptor.defaultPeriod, expected);
-    }
+test('Activity period presets and default follow the native Activity selector', async () => {
+    const subject = await setup({ from: at(0), to: at(1), rows: [] });
+    assert.deepEqual([...subject.descriptor.periods], [7, 30, 90, 180, 365, 'all']);
+    assert.equal(subject.descriptor.defaultPeriod, 30);
+    assert.equal(subject.descriptor.periodSource, 'activity');
 });
 
-test('failed Activity section registration releases registered settings UI', async () => {
+test('personal Activity queries the authenticated account through the own-feed API', async () => {
+    let plugin;
+    let provideOwn;
+    const calls = [];
+    vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
+    await plugin.start({
+        settings: { async get() { assert.fail('No plugin-owned period setting'); }, async register() { assert.fail('No plugin-owned period setting'); } },
+        ui: {
+            async addUserActivitySection() { return async () => {}; },
+            async addOwnActivitySection(descriptor, compute) {
+                assert.equal(descriptor.id, 'own-status-usage');
+                assert.equal(descriptor.periodSource, 'activity-page');
+                assert.deepEqual([...descriptor.periods], [30, 90, 180, 365, 'all']);
+                provideOwn = compute;
+                return async () => {};
+            }
+        },
+        vrcx: {
+            async queryFeed() { assert.fail('Personal Activity must use queryOwnFeed'); },
+            async queryOwnFeed(value) {
+                calls.push(value);
+                return { from: at(0), to: at(4), rows: [row(at(0), 'Status', 'join me'), row(at(3), 'Offline')] };
+            }
+        }
+    });
+    const result = await provideOwn({ period: 90 });
+    assert.equal(result.data.find((item) => item.status === 'join me').percentage, 100);
+    assert.equal(result.totalMilliseconds, 3 * hour);
+    assert.deepEqual(JSON.parse(JSON.stringify(calls)), [{ period: 90 }]);
+    await plugin.stop();
+});
+
+test('failed first Activity registration leaves no registration behind', async () => {
     let plugin;
     let cleaned = 0;
     vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
     await assert.rejects(plugin.start({
-        settings: { async get() {}, async register() { return async () => { cleaned += 1; }; } },
+        settings: { async get() {}, async register() { assert.fail('BetterActivity uses native Activity periods, not custom settings'); } },
         ui: { async addUserActivitySection() { throw new Error('Adapter unavailable'); } }
     }), /Adapter unavailable/);
     await plugin.stop();
-    assert.equal(cleaned, 1);
+    assert.equal(cleaned, 0);
 });
 
-test('stop attempts both cleanup handlers even if one fails', async () => {
+test('stop attempts both Activity cleanup handlers even if one fails', async () => {
     let plugin;
-    let cleanedSettings = 0;
+    let cleanedFriendActivity = 0;
+    let cleanedOwnActivity = 0;
     vm.runInContext(source, vm.createContext({ registerPlugin(value) { plugin = value; } }), { timeout: 1000 });
     await plugin.start({
-        settings: { async get() {}, async register() { return async () => { cleanedSettings += 1; }; } },
-        ui: { async addUserActivitySection() { return async () => { throw new Error('Section cleanup failed'); }; } }
+        settings: { async get() {}, async register() { assert.fail('BetterActivity uses native Activity periods, not custom settings'); } },
+        ui: {
+            async addUserActivitySection() { return async () => { cleanedFriendActivity += 1; }; },
+            async addOwnActivitySection() { return async () => { cleanedOwnActivity += 1; throw new Error('Section cleanup failed'); }; }
+        }
     });
     await assert.rejects(plugin.stop(), /Section cleanup failed/);
-    assert.equal(cleanedSettings, 1);
+    assert.equal(cleanedFriendActivity, 1);
+    assert.equal(cleanedOwnActivity, 1);
 });

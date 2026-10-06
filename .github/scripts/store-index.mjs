@@ -7,7 +7,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const safePath = (value) => typeof value === 'string' && /^(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_.-]+$/.test(value)
     && !value.split('/').some((part) => part === '.' || part === '..');
-const permissions = new Set(['feed.read', 'friends.read', 'user.read', 'userDialog.modify', 'settings.create', 'storage', 'notifications']);
+const permissions = new Set(['feed.read', 'friends.read', 'user.read', 'userDialog.modify', 'activityPage.modify', 'settings.create', 'storage', 'notifications']);
 const validPermissions = (value) => Array.isArray(value) && new Set(value).size === value.length && value.every((permission) => permissions.has(permission));
 const versionParts = (value) => /^\d+\.\d+\.\d+$/.test(value) ? value.split('.').map(BigInt) : null;
 const compareVersion = (a, b) => {
@@ -61,6 +61,31 @@ async function build() {
         if (!safePath(manifest.entry) || !safePath(manifest.icon)) throw new Error(`Invalid path: ${manifest.id}`);
         if (!validPermissions(manifest.permissions)) throw new Error('Unknown or duplicate permission');
         for (const key of ['name', 'author', 'description', 'updatedAt']) if (typeof manifest[key] !== 'string' || !manifest[key].trim()) throw new Error(`Missing ${key}`);
+        const localized = {};
+        if (manifest.localized !== undefined) {
+            if (!manifest.localized || typeof manifest.localized !== 'object' || Array.isArray(manifest.localized)
+                || Object.keys(manifest.localized).some((language) => !['ja', 'en'].includes(language))) {
+                throw new Error(`Invalid localized metadata: ${manifest.id}`);
+            }
+            for (const language of ['ja', 'en']) {
+                const value = manifest.localized[language];
+                if (value === undefined) continue;
+                if (!value || typeof value !== 'object' || Array.isArray(value)
+                    || Object.keys(value).some((key) => !['name', 'description'].includes(key))) {
+                    throw new Error(`Invalid localized metadata: ${manifest.id}`);
+                }
+                const entry = {};
+                for (const key of ['name', 'description']) {
+                    if (value[key] === undefined) continue;
+                    if (typeof value[key] !== 'string' || !value[key].trim()
+                        || value[key].length > (key === 'description' ? 4000 : 300)) {
+                        throw new Error(`Invalid localized metadata: ${manifest.id}`);
+                    }
+                    entry[key] = value[key];
+                }
+                localized[language] = entry;
+            }
+        }
         const files = {};
         for (const filename of await filesUnder(path.join(root, prefix))) {
             files[path.relative(root, filename).replaceAll('\\', '/')] = hash(await readFile(filename));
@@ -92,6 +117,7 @@ async function build() {
             version: manifest.version,
             author: manifest.author,
             description: manifest.description,
+            ...(Object.keys(localized).length ? { localized } : {}),
             updatedAt: manifest.updatedAt,
             apiVersion: manifest.apiVersion,
             entry,
