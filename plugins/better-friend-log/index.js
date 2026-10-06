@@ -126,6 +126,9 @@
     const observedAt = Date.parse(evidence.observedAt);
     const at = Date.parse(evidence.addedAt);
     const validAddedAt = Number.isFinite(at) && Number.isFinite(observedAt) && at <= observedAt;
+    // The installed renderer uses an empty entry list for missing history.
+    // Returning an undated entry would select its old mutual-only explanation.
+    if (!validAddedAt) return { entries: [], mutualAvailable };
     const targetFeed = validAddedAt ? feedPresence(feed, requestedUserId, at) : null;
     const encounter = validAddedAt ? encounterPresence(evidence.encounter, at) : null;
     const targetJoinedAt = encounter?.presence.get(requestedUserId);
@@ -135,7 +138,6 @@
     const targetFeedLocation = targetLeftAfterGps ? null : targetFeed?.location;
     const sharedLocation = targetInEncounter ? encounter.location : targetFeedLocation;
     const introducedBy = [];
-    const mutualOnly = [];
     for (const person of roster.values()) {
       const id = userId(person);
       if (id === requestedUserId) continue;
@@ -152,20 +154,17 @@
       const inFeed = targetFeedLocation && personFeed?.location === targetFeedLocation && !personLeftAfterGps && (!targetInEncounter || targetFeedLocation === encounter.location);
       if (relationship.eligible && (inEncounter || inFeed)) {
         introducedBy.push({ userId: id, displayName, evidence: mutual.has(id) ? ["co-presence", "mutual-friend"] : ["co-presence"], relationshipKnown: relationship.known });
-      } else if (mutual.has(id)) {
-        // Current mutuals are suggestions only. They do not establish who
-        // was present, or even who was already a friend at the time.
-        mutualOnly.push({ userId: id, displayName });
       }
     }
     introducedBy.sort((a, b) => Number(b.evidence.includes("mutual-friend")) - Number(a.evidence.includes("mutual-friend")) || a.displayName.localeCompare(b.displayName));
-    mutualOnly.sort((a, b) => a.displayName.localeCompare(b.displayName));
     const entry = {
       friendUserId: requestedUserId,
       friendName: text(target, "displayName", "display_name") || requestedUserId,
       addedAt: validAddedAt ? new Date(at).toISOString() : null,
       introducedBy,
-      mutualOnly,
+      // Keep the renderer contract while never displaying mutual-only people.
+      // Mutual friends only corroborate and rank candidates with co-presence.
+      mutualOnly: [],
     };
     if (sharedLocation) entry.location = sharedLocation;
     if (targetInEncounter && encounter.worldName) entry.worldName = encounter.worldName;

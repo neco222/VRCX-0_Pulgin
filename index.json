@@ -4,24 +4,24 @@
     {
       "id": "better-friend-log",
       "name": "BetterFriendLog",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": "VRCX-0 Plugin Store",
-      "description": "Combines recorded co-presence and current mutual friends to suggest possible introducers. Requires BetterDiscord v0.2.8 or later.",
+      "description": "Shows existing friends recorded in the same instance at the friendship time, prioritizing current mutual friends. Requires BetterDiscord v0.2.8 or later.",
       "localized": {
         "ja": {
           "name": "BetterFriendLog",
-          "description": "同席履歴と現在の共通フレンドを照合し、紹介者の候補を表示します。BetterDiscord v0.2.8以降が必要です。"
+          "description": "フレンドになった時刻に同じインスタンスにいた既存フレンドを表示し、現在の共通フレンドを優先します。BetterDiscord v0.2.8以降が必要です。"
         },
         "en": {
           "name": "BetterFriendLog",
-          "description": "Combines recorded co-presence and current mutual friends to suggest possible introducers. Requires BetterDiscord v0.2.8 or later."
+          "description": "Shows existing friends recorded in the same instance at the friendship time, prioritizing current mutual friends. Requires BetterDiscord v0.2.8 or later."
         }
       },
       "updatedAt": "2026-10-06",
       "apiVersion": 1,
       "entry": "plugins/better-friend-log/index.js",
       "manifest": "plugins/better-friend-log/manifest.json",
-      "sha256": "d9f2c33fdc9bd4b1fa503bc9d5310fdb8c8319b2522488d860e4f6c7d6f8ceeb",
+      "sha256": "6a381113ebad6cb4b3311a6ff9bb386aee021c3292d82ade542e2d99f4e6811a",
       "icon": "plugins/better-friend-log/assets/icon.svg",
       "permissions": [
         "friends.read",
@@ -30,8 +30,8 @@
       ],
       "files": {
         "plugins/better-friend-log/assets/icon.svg": "12b656b4fceb225bfacd0c46f651d2f2ad1b77e2a45befd5242d89f725c57b25",
-        "plugins/better-friend-log/index.js": "d9f2c33fdc9bd4b1fa503bc9d5310fdb8c8319b2522488d860e4f6c7d6f8ceeb",
-        "plugins/better-friend-log/manifest.json": "88bb67454f693fb302273a25c2eb6815be0eb33b398fdb2eca8116e9559766fd"
+        "plugins/better-friend-log/index.js": "6a381113ebad6cb4b3311a6ff9bb386aee021c3292d82ade542e2d99f4e6811a",
+        "plugins/better-friend-log/manifest.json": "0a2a8055f8fbf810d5b14bce573eaa041e6387627453adeb2a5f84bf13e85765"
       },
       "releases": [
         {
@@ -48,6 +48,16 @@
           "version": "1.0.1",
           "entry": "plugins/better-friend-log/index.js",
           "sha256": "354167eac11dc23e928b23980c95b01f5435347673887df0360493bdaaa44ef5",
+          "permissions": [
+            "friends.read",
+            "feed.read",
+            "userDialog.modify"
+          ]
+        },
+        {
+          "version": "1.1.0",
+          "entry": "plugins/better-friend-log/index.js",
+          "sha256": "d9f2c33fdc9bd4b1fa503bc9d5310fdb8c8319b2522488d860e4f6c7d6f8ceeb",
           "permissions": [
             "friends.read",
             "feed.read",

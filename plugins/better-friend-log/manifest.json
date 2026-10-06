@@ -1,17 +1,17 @@
 {
   "id": "better-friend-log",
   "name": "BetterFriendLog",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "VRCX-0 Plugin Store",
-  "description": "Combines recorded co-presence and current mutual friends to suggest possible introducers. Requires BetterDiscord v0.2.8 or later.",
+  "description": "Shows existing friends recorded in the same instance at the friendship time, prioritizing current mutual friends. Requires BetterDiscord v0.2.8 or later.",
   "localized": {
     "ja": {
       "name": "BetterFriendLog",
-      "description": "同席履歴と現在の共通フレンドを照合し、紹介者の候補を表示します。BetterDiscord v0.2.8以降が必要です。"
+      "description": "フレンドになった時刻に同じインスタンスにいた既存フレンドを表示し、現在の共通フレンドを優先します。BetterDiscord v0.2.8以降が必要です。"
     },
     "en": {
       "name": "BetterFriendLog",
-      "description": "Combines recorded co-presence and current mutual friends to suggest possible introducers. Requires BetterDiscord v0.2.8 or later."
+      "description": "Shows existing friends recorded in the same instance at the friendship time, prioritizing current mutual friends. Requires BetterDiscord v0.2.8 or later."
     }
   },
   "updatedAt": "2026-10-06",

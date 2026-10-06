@@ -105,24 +105,27 @@ test('mutual friends corroborate co-presence and rank before co-presence alone',
     }));
     const entry = (await active.query()).entries[0];
     assert.deepEqual(entry.introducedBy.map((row) => [row.userId, row.evidence]), [[bob, ['co-presence', 'mutual-friend']], [alice, ['co-presence']]]);
-    assert.deepEqual(entry.mutualOnly, [{ userId: charlie, displayName: 'Charlie' }]);
+    assert.deepEqual(entry.mutualOnly, []);
+    assert.ok(!JSON.stringify(entry).includes(charlie));
 });
 
-test('current common friends without same-instance evidence remain weaker suggestions', async () => {
+test('current common friends without same-instance evidence are not returned for display', async () => {
     const active = await harness(evidence({ feedRows: [], mutualFriends: { available: true, userIds: [alice] } }));
     const result = await active.query();
     assert.equal(result.mutualAvailable, true);
     assert.deepEqual(result.entries[0].introducedBy, []);
-    assert.deepEqual(result.entries[0].mutualOnly, [{ userId: alice, displayName: 'Alice' }]);
+    assert.deepEqual(result.entries[0].mutualOnly, []);
+    assert.ok(!JSON.stringify(result).includes(alice));
 });
 
-test('common friends still display when original friendship time was never recorded', async () => {
-    const active = await harness(evidence({ addedAt: null, relationships: [], mutualFriends: { available: true, userIds: [alice] } }));
-    const entry = (await active.query()).entries[0];
-    assert.equal(entry.addedAt, null);
-    assert.deepEqual(entry.introducedBy, []);
-    assert.deepEqual(entry.mutualOnly, [{ userId: alice, displayName: 'Alice' }]);
-    assert.equal(entry.location, undefined);
+test('missing original friendship time cannot generate candidates from common friends', async () => {
+    for (const missingTime of [null, '', 'invalid timestamp']) {
+        const active = await harness(evidence({ addedAt: missingTime, relationships: [], mutualFriends: { available: true, userIds: [alice] } }));
+        const result = await active.query();
+        assert.equal(result.mutualAvailable, true);
+        assert.deepEqual(result.entries, []);
+        assert.ok(!JSON.stringify(result).includes(alice));
+    }
 });
 
 test('Unavailable mutual data cannot be mistaken for positive common-friend evidence', async () => {
@@ -163,7 +166,7 @@ test('friends added later or already unfriended at that time are excluded from i
         const active = await harness(evidence({ relationships: [friend(target, addedAt), ...relationships], mutualFriends: { available: true, userIds: [alice] } }));
         const entry = (await active.query()).entries[0];
         assert.deepEqual(entry.introducedBy, []);
-        assert.equal(entry.mutualOnly[0].userId, alice);
+        assert.deepEqual(entry.mutualOnly, []);
     }
 });
 
@@ -238,10 +241,79 @@ test('future native joins/departures and out-of-visit events cannot rewrite hist
     assert.equal((await afterVisit.query()).entries[0].introducedBy[0].userId, alice);
 
     const futureFriendship = await harness(evidence({ addedAt: '2026-10-07T10:00:00.000Z', mutualFriends: { available: true, userIds: [alice] } }));
-    const entry = (await futureFriendship.query()).entries[0];
-    assert.equal(entry.addedAt, null);
+    assert.deepEqual((await futureFriendship.query()).entries, []);
+});
+
+test('mutual data never revives candidates with rejected or absent co-presence evidence', async () => {
+    const scenarios = [
+        { feedRows: [] },
+        { feedRows: [feed(target), feed(alice, 'GPS', before, 'private')] },
+        { feedRows: [feed(target), feed(alice), feed(alice, 'Offline', '2026-10-06T09:50:00.000Z')] },
+        { feedRows: [feed(target, 'GPS', after), feed(alice)] },
+        { feedRows: [], encounter: encounter([player(target)]) },
+        { feedRows: [], encounter: { ...encounter([player(target), player(alice)]), durationMs: 45 * 60 * 1000 } },
+    ];
+    for (const scenario of scenarios) {
+        const active = await harness(evidence({ ...scenario, mutualFriends: { available: true, userIds: [alice] } }));
+        const result = await active.query();
+        assert.equal(result.mutualAvailable, true);
+        assert.deepEqual(result.entries[0].introducedBy, []);
+        assert.deepEqual(result.entries[0].mutualOnly, []);
+        assert.ok(!JSON.stringify(result).includes(alice));
+    }
+});
+
+test('only people present in the same instance at friendship time qualify, even when all are mutual friends', async () => {
+    const present = id(5);
+    const active = await harness(evidence({
+        friends: [person(target, 'Target', 50), person(alice, 'Met yesterday'), person(bob, 'Left just before'), person(charlie, 'Joined just after'), person(present, 'Present at friendship')],
+        relationships: [friend(target, addedAt), friend(alice), friend(bob), friend(charlie), friend(present)],
+        mutualFriends: { available: true, userIds: [alice, bob, charlie, present] },
+        feedRows: [],
+        encounter: encounter([
+            player(target),
+            player(alice, 'OnPlayerJoined', '2026-10-05T09:30:00.000Z'),
+            player(bob),
+            player(bob, 'OnPlayerLeft', '2026-10-06T09:59:59.999Z'),
+            player(charlie, 'OnPlayerJoined', '2026-10-06T10:00:00.001Z'),
+            player(present),
+        ]),
+    }));
+    const entry = (await active.query()).entries[0];
+    assert.deepEqual(entry.introducedBy, [{ userId: present, displayName: 'Present at friendship', evidence: ['co-presence', 'mutual-friend'], relationshipKnown: true }]);
+    assert.deepEqual(entry.mutualOnly, []);
+    for (const excluded of [alice, bob, charlie]) assert.ok(!JSON.stringify(entry).includes(excluded));
+});
+
+test('native friendship-time boundary includes joining then, excludes leaving then and ignores later rejoins', async () => {
+    const scenarios = [
+        { events: [player(target), player(alice, 'OnPlayerJoined', addedAt)], expected: [alice] },
+        { events: [player(target), player(alice), player(alice, 'OnPlayerLeft', addedAt)], expected: [] },
+        { events: [player(target), player(alice), player(alice, 'OnPlayerLeft', '2026-10-06T09:59:59.999Z'), player(alice, 'OnPlayerJoined', '2026-10-06T10:00:00.001Z')], expected: [] },
+        { events: [player(target), player(alice), player(target, 'OnPlayerLeft', addedAt)], expected: [] },
+    ];
+    for (const { events, expected } of scenarios) {
+        const active = await harness(evidence({ feedRows: [], encounter: encounter(events), mutualFriends: { available: true, userIds: [alice] } }));
+        const entry = (await active.query()).entries[0];
+        assert.deepEqual(entry.introducedBy.map((row) => row.userId), expected);
+        assert.deepEqual(entry.mutualOnly, []);
+    }
+});
+
+test('same-instance encounter on a previous day is not presence at the later friendship time', async () => {
+    const yesterday = '2026-10-05T09:30:00.000Z';
+    const active = await harness(evidence({
+        feedRows: [],
+        mutualFriends: { available: true, userIds: [alice] },
+        encounter: {
+            ...encounter([player(target, 'OnPlayerJoined', yesterday), player(alice, 'OnPlayerJoined', yesterday)]),
+            createdAt: '2026-10-05T09:00:00.000Z',
+        },
+    }));
+    const entry = (await active.query()).entries[0];
     assert.deepEqual(entry.introducedBy, []);
-    assert.equal(entry.mutualOnly[0].userId, alice);
+    assert.deepEqual(entry.mutualOnly, []);
+    assert.ok(!JSON.stringify(entry).includes(alice));
 });
 
 test('hidden people and owner are excluded from co-presence and common-friend suggestions', async () => {
