@@ -11,7 +11,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 test('catalog hashes include manifest, executable entry and packaged icon', async () => {
     const catalog = JSON.parse(await readFile(path.join(root, 'index.json'), 'utf8'));
     assert.equal(catalog.schemaVersion, 1);
-    assert.equal(catalog.plugins.length, 1);
+    assert.deepEqual(catalog.plugins.map((plugin) => plugin.id).sort(), ['better-friend-log', 'user-status-stats']);
     for (const plugin of catalog.plugins) {
         assert.equal(plugin.sha256, plugin.files[plugin.entry]);
         assert.ok(plugin.files[plugin.manifest]);
@@ -53,7 +53,7 @@ test('version bumps keep approved old hashes, and explicit releases list can rev
         await cp(path.join(root, 'index.json'), path.join(fixture, 'index.json'));
         const indexPath = path.join(fixture, 'index.json');
         const manifestPath = path.join(fixture, 'plugins/user-status-stats/manifest.json');
-        const before = JSON.parse(await readFile(indexPath, 'utf8')).plugins[0];
+        const before = JSON.parse(await readFile(indexPath, 'utf8')).plugins.find((plugin) => plugin.id === 'user-status-stats');
         const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
         const version = manifest.version.split('.').map(Number);
         version[2] += 1;
@@ -63,7 +63,7 @@ test('version bumps keep approved old hashes, and explicit releases list can rev
         const generate = () => spawnSync(process.execPath, [path.join(fixture, '.github/scripts/store-index.mjs')], { encoding: 'utf8' });
         const updated = generate();
         assert.equal(updated.status, 0, updated.stderr);
-        const after = JSON.parse(await readFile(indexPath, 'utf8')).plugins[0];
+        const after = JSON.parse(await readFile(indexPath, 'utf8')).plugins.find((plugin) => plugin.id === 'user-status-stats');
         assert.deepEqual(after.releases, [
             ...(before.releases ?? []).filter((release) => release.version !== before.version),
             { version: before.version, entry: before.entry, sha256: before.sha256, permissions: before.permissions }
