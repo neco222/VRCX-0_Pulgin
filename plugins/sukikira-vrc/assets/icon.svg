@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Sukikira VRC">
+  <rect width="96" height="96" rx="24" fill="#172033"/>
+  <path d="M48 62 24 39c-13-13 6-29 18-17l6 6 6-6c12-12 31 4 18 17Z" fill="#fb7185"/>
+  <path d="M22 75h32" stroke="#fb7185" stroke-width="10" stroke-linecap="round"/>
+  <path d="M64 75h10" stroke="#38bdf8" stroke-width="10" stroke-linecap="round"/>
+</svg>

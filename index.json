@@ -77,6 +77,37 @@
       ]
     },
     {
+      "id": "sukikira-vrc",
+      "name": "Sukikira VRC (UI Preview)",
+      "version": "1.0.0",
+      "author": "neco222",
+      "description": "UI preview only: live voting and percentage retrieval are not connected. Adds the Review tab layout. Requires BetterDiscord v0.4.0 or later.",
+      "localized": {
+        "ja": {
+          "name": "すききらVRC（UIプレビュー）",
+          "description": "UIプレビュー版です。実サイトへの投票・割合取得は未接続のため、投票ボタンは無効になります。レビュータブの画面構成を追加します。BetterDiscord v0.4.0以降が必要です。"
+        },
+        "en": {
+          "name": "Sukikira VRC (UI Preview)",
+          "description": "UI preview only: live voting and percentage retrieval are not connected. Adds the Review tab layout. Requires BetterDiscord v0.4.0 or later."
+        }
+      },
+      "updatedAt": "2026-10-14",
+      "apiVersion": 1,
+      "entry": "plugins/sukikira-vrc/index.js",
+      "manifest": "plugins/sukikira-vrc/manifest.json",
+      "sha256": "2d9b271dda93aae5bcdc651f10fdf613beec69bd2671cc23458d92026d81c1dd",
+      "icon": "plugins/sukikira-vrc/assets/icon.svg",
+      "permissions": [
+        "userDialog.modify"
+      ],
+      "files": {
+        "plugins/sukikira-vrc/assets/icon.svg": "5b7febb2ed4f7f4a488a4e76df1bcb32459e292ccddc967a6f3180affd58676c",
+        "plugins/sukikira-vrc/index.js": "2d9b271dda93aae5bcdc651f10fdf613beec69bd2671cc23458d92026d81c1dd",
+        "plugins/sukikira-vrc/manifest.json": "dfcb4b4b6047630e1fd9374f1d8dd1be6647d7cbf70893e18e887cf645d05e98"
+      }
+    },
+    {
       "id": "user-status-stats",
       "name": "BetterActivity",
       "version": "1.4.1",

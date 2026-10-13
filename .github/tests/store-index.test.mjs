@@ -11,7 +11,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 test('catalog hashes include manifest, executable entry and packaged icon', async () => {
     const catalog = JSON.parse(await readFile(path.join(root, 'index.json'), 'utf8'));
     assert.equal(catalog.schemaVersion, 1);
-    assert.deepEqual(catalog.plugins.map((plugin) => plugin.id).sort(), ['better-friend-log', 'user-status-stats']);
+    assert.deepEqual(catalog.plugins.map((plugin) => plugin.id).sort(), ['better-friend-log', 'sukikira-vrc', 'user-status-stats']);
     for (const plugin of catalog.plugins) {
         assert.equal(plugin.sha256, plugin.files[plugin.entry]);
         assert.ok(plugin.files[plugin.manifest]);
