@@ -57,7 +57,13 @@ test('registers only the host Review tab and supports OFF and re-enable', async 
 test('unsupported loader reports the required version and can recover after update', async () => {
     const plugin = loadPlugin();
     for (const host of [undefined, {}, { ui: {} }, api(null)]) {
-        await assert.rejects(plugin.start(host), /BetterDiscord v0\.4\.0/);
+        await assert.rejects(plugin.start(host), (error) => {
+            assert.match(error.message, /Review tab support in BetterVRCX0 v0\.4\.0/);
+            assert.match(error.message, /update BetterVRCX0 and restart VRCX-0/);
+            assert.match(error.message, /レビュータブに対応したBetterVRCX0 v0\.4\.0以降へ更新し、VRCX-0を再起動/);
+            assert.doesNotMatch(error.message, /BetterDiscord/);
+            return true;
+        });
     }
     let removed = 0;
     await plugin.start(api(async () => () => { removed++; }));

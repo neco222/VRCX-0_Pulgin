@@ -374,7 +374,11 @@ test('schema/user mismatch is rejected and missing host support explains how to 
         await assert.rejects(active.query, /incompatible friendship evidence/);
     }
     const plugin = loadPlugin();
-    await assert.rejects(plugin.start({ ui: {}, vrcx: {} }), /update BetterDiscord/);
+    await assert.rejects(plugin.start({ ui: {}, vrcx: {} }), (error) => {
+        assert.match(error.message, /update BetterVRCX0/);
+        assert.doesNotMatch(error.message, /BetterDiscord/);
+        return true;
+    });
 });
 
 test('OFF drops pending query results and disposed callbacks cannot request more evidence', async () => {

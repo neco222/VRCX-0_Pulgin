@@ -4,24 +4,24 @@
     {
       "id": "better-friend-log",
       "name": "BetterFriendLog",
-      "version": "1.1.2",
+      "version": "1.1.3",
       "author": "VRCX-0 Plugin Store",
-      "description": "Shows possible introducers only when both current mutual friendship and recorded same-instance presence at the friendship time are confirmed. Requires BetterDiscord v0.2.8 or later.",
+      "description": "Shows possible introducers only when both current mutual friendship and recorded same-instance presence at the friendship time are confirmed. Requires BetterVRCX0 v0.2.8 or later.",
       "localized": {
         "ja": {
           "name": "BetterFriendLog",
-          "description": "現在の共通フレンドであり、フレンドになった時刻に同じインスタンスにいた履歴もある人だけを紹介者の候補として表示します。BetterDiscord v0.2.8以降が必要です。"
+          "description": "現在の共通フレンドであり、フレンドになった時刻に同じインスタンスにいた履歴もある人だけを紹介者の候補として表示します。BetterVRCX0 v0.2.8以降が必要です。"
         },
         "en": {
           "name": "BetterFriendLog",
-          "description": "Shows possible introducers only when both current mutual friendship and recorded same-instance presence at the friendship time are confirmed. Requires BetterDiscord v0.2.8 or later."
+          "description": "Shows possible introducers only when both current mutual friendship and recorded same-instance presence at the friendship time are confirmed. Requires BetterVRCX0 v0.2.8 or later."
         }
       },
-      "updatedAt": "2026-10-06",
+      "updatedAt": "2026-10-22",
       "apiVersion": 1,
       "entry": "plugins/better-friend-log/index.js",
       "manifest": "plugins/better-friend-log/manifest.json",
-      "sha256": "feb02908bfa3fe4a0e398280b58c736cddd74509da0720c15d0097dccfdff19f",
+      "sha256": "59c771750e549ab61bf1070a9ff04d0334dc45e74de5879812c402b63b0361cb",
       "icon": "plugins/better-friend-log/assets/icon.svg",
       "permissions": [
         "friends.read",
@@ -30,8 +30,8 @@
       ],
       "files": {
         "plugins/better-friend-log/assets/icon.svg": "12b656b4fceb225bfacd0c46f651d2f2ad1b77e2a45befd5242d89f725c57b25",
-        "plugins/better-friend-log/index.js": "feb02908bfa3fe4a0e398280b58c736cddd74509da0720c15d0097dccfdff19f",
-        "plugins/better-friend-log/manifest.json": "ffbb9079198715787996a6431f857644d9e86485a750901ffaa4d1e70f5ee4a8"
+        "plugins/better-friend-log/index.js": "59c771750e549ab61bf1070a9ff04d0334dc45e74de5879812c402b63b0361cb",
+        "plugins/better-friend-log/manifest.json": "843c9f9c880704417ff39dd6a444371d08f94b95fe1665ff92a3f982178a4524"
       },
       "releases": [
         {
@@ -73,39 +73,59 @@
             "feed.read",
             "userDialog.modify"
           ]
+        },
+        {
+          "version": "1.1.2",
+          "entry": "plugins/better-friend-log/index.js",
+          "sha256": "feb02908bfa3fe4a0e398280b58c736cddd74509da0720c15d0097dccfdff19f",
+          "permissions": [
+            "friends.read",
+            "feed.read",
+            "userDialog.modify"
+          ]
         }
       ]
     },
     {
       "id": "sukikira-vrc",
       "name": "Sukikira VRC (UI Preview)",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": "neco222",
-      "description": "UI preview only: live voting and percentage retrieval are not connected. Adds the Review tab layout. Requires BetterDiscord v0.4.0 or later.",
+      "description": "UI preview only: live voting and percentage retrieval are not connected. Adds the Review tab layout. Requires BetterVRCX0 v0.4.0 or later.",
       "localized": {
         "ja": {
           "name": "すききらVRC（UIプレビュー）",
-          "description": "UIプレビュー版です。実サイトへの投票・割合取得は未接続のため、投票ボタンは無効になります。レビュータブの画面構成を追加します。BetterDiscord v0.4.0以降が必要です。"
+          "description": "UIプレビュー版です。実サイトへの投票・割合取得は未接続のため、投票ボタンは無効になります。レビュータブの画面構成を追加します。BetterVRCX0 v0.4.0以降が必要です。"
         },
         "en": {
           "name": "Sukikira VRC (UI Preview)",
-          "description": "UI preview only: live voting and percentage retrieval are not connected. Adds the Review tab layout. Requires BetterDiscord v0.4.0 or later."
+          "description": "UI preview only: live voting and percentage retrieval are not connected. Adds the Review tab layout. Requires BetterVRCX0 v0.4.0 or later."
         }
       },
-      "updatedAt": "2026-10-14",
+      "updatedAt": "2026-10-22",
       "apiVersion": 1,
       "entry": "plugins/sukikira-vrc/index.js",
       "manifest": "plugins/sukikira-vrc/manifest.json",
-      "sha256": "2d9b271dda93aae5bcdc651f10fdf613beec69bd2671cc23458d92026d81c1dd",
+      "sha256": "bbb070a13307ee22f1f84420c9f74fc9f42a0293e82f7e78bf0b86b3ece212b3",
       "icon": "plugins/sukikira-vrc/assets/icon.svg",
       "permissions": [
         "userDialog.modify"
       ],
       "files": {
         "plugins/sukikira-vrc/assets/icon.svg": "5b7febb2ed4f7f4a488a4e76df1bcb32459e292ccddc967a6f3180affd58676c",
-        "plugins/sukikira-vrc/index.js": "2d9b271dda93aae5bcdc651f10fdf613beec69bd2671cc23458d92026d81c1dd",
-        "plugins/sukikira-vrc/manifest.json": "dfcb4b4b6047630e1fd9374f1d8dd1be6647d7cbf70893e18e887cf645d05e98"
-      }
+        "plugins/sukikira-vrc/index.js": "bbb070a13307ee22f1f84420c9f74fc9f42a0293e82f7e78bf0b86b3ece212b3",
+        "plugins/sukikira-vrc/manifest.json": "6d843ad99542adb32d1b5538f00b847bb1587e1f287d1f0f1651624049f69552"
+      },
+      "releases": [
+        {
+          "version": "1.0.0",
+          "entry": "plugins/sukikira-vrc/index.js",
+          "sha256": "2d9b271dda93aae5bcdc651f10fdf613beec69bd2671cc23458d92026d81c1dd",
+          "permissions": [
+            "userDialog.modify"
+          ]
+        }
+      ]
     },
     {
       "id": "user-status-stats",

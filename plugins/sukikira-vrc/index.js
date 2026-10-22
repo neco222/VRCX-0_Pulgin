@@ -13,7 +13,7 @@
       if (activeGeneration !== generation) return;
 
       if (typeof api?.ui?.addUserReviewTab !== "function") {
-        throw new Error("すききらVRC requires BetterDiscord v0.4.0 or later. Please update BetterDiscord and restart VRCX-0. / BetterDiscord v0.4.0以降へ更新し、VRCX-0を再起動してください。");
+        throw new Error("すききらVRC requires Review tab support in BetterVRCX0 v0.4.0 or later. Please update BetterVRCX0 and restart VRCX-0. / レビュータブに対応したBetterVRCX0 v0.4.0以降へ更新し、VRCX-0を再起動してください。");
       }
 
       let tabDispose;

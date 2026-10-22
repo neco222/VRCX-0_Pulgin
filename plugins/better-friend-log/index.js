@@ -179,7 +179,7 @@
       await previousDispose?.();
       if (activeGeneration !== generation) return;
       if (typeof api.vrcx.getFriendLogEvidence !== "function") {
-        throw new Error("BetterFriendLog requires a newer BetterDiscord loader. Please update BetterDiscord.");
+        throw new Error("BetterFriendLog requires a newer BetterVRCX0 loader. Please update BetterVRCX0.");
       }
       const sectionDispose = await api.ui.addUserActivitySummarySection(
         {
